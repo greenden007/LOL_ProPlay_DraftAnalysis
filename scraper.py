@@ -3,13 +3,14 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import time
 
-LIQUIPEDIA_BASE_URL = "https://liquipedia.net/leagueoflegends"
+GOLGG_BASE_URL = "https://gol.gg/"
+GOLGG_TOURNAMENT_ENDPOINT = "tournament/list/"
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
 }
 
-def get_tourney_links():
-    url = f"{LIQUIPEDIA_BASE_URL}/Portal:Tournaments"
+def get_tourney_links_golgg():
+    url = f"{GOLGG_BASE_URL}{GOLGG_TOURNAMENT_ENDPOINT}"
     response = requests.get(url, headers=HEADERS)
     if (response.status_code != 200):
         print("Failed")
@@ -18,14 +19,9 @@ def get_tourney_links():
     soup = BeautifulSoup(response.text, "html.parser")
     links = []
 
-    for a in soup.select("div. a"):
-        href = a.get("href")
-        if href and "/leagueoflegends/" in href:
-            links.append(href)
+    
 
-    return links
-
-def get_match_draft_data(tourney_url):
+def get_match_draft_data_liquipedia(tourney_url):
     response = requests.get(tourney_url, headers=HEADERS)
     if response.status_code != 200:
         print("Failed")
@@ -51,18 +47,4 @@ def get_match_draft_data(tourney_url):
 
     return matches
 
-def main():
-    tourneys = get_tourney_links()
-    matches = []
 
-    for i, tourney in enumerate(tourneys[:3]): # TODO: convert to full array after completed tests
-        print(f"Scraping tournament {i+1}/{len(tourneys[:3])}")
-        match_data = get_match_draft_data(tourney)
-        matches.extend(match_data)
-    
-    df = pd.DataFrame(matches)
-    df.to_csv("matches.csv", index=False)
-    print("Done")
-
-if __name__ == "__main__":
-    main()
