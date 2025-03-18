@@ -2,6 +2,7 @@ import enum
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
+import re
 import time
 
 GOLGG_BASE_URL = "https://gol.gg/"
@@ -21,7 +22,7 @@ class Split(enum.Enum):
 def GOL_GG_SEASON_SPLIT_URL_GEN(season: int, split: Split):
     return f"season-S{season}/{split.value}"
 
-def scrape_pick_ban_by_patch(url: str):
+def scrape_pick_ban_by_patch(url: str) -> pd.DataFrame:
     """
     Scrapes pick/ban data from gol.gg for a given season and split.
 
@@ -36,29 +37,61 @@ def scrape_pick_ban_by_patch(url: str):
         response.raise_for_status()
     except requests.exceptions.RequestException as e:
         print(f"Error: {e}")
-        return None
+        return pd.DataFrame()
 
     soup = BeautifulSoup(response.content, 'html.parser')
-    table = soup.find('table', class_='table_list playerslist tablesaw')
-    if table is None:
-        raise Exception("Table not found")
     
-    data = []
-
-    for row in table.find_all('tr'):
-        cells = row.find_all('td')
-        if len(cells) >= 2:
-            champion = cells[0].text.strip()
-            pick_ban_percentage = cells[1].text.strip()
-            data.append([champion, pick_ban_percentage])
-
-    return pd.DataFrame(data, columns=['Champion', 'Pick/Ban Percentage'])
+    headers = soup.find_all('th')
+    patch_headers = [header.text.strip() for header in headers]
+    
+    # Find all table cells
+    cells = soup.find_all('td', {'style': 'vertical-align:top'})
+    
+    all_champions_data = []
+    
+    # Process each cell (corresponds to a patch)
+    for i, cell in enumerate(cells):
+        patch = patch_headers[i] if i < len(patch_headers) else f"Unknown_Patch_{i}"
+        
+        # Find all champion divs in this cell
+        champion_divs = cell.find_all('div', {'class': re.compile(r'[A-Za-z]')})
+        
+        # Filter out divs that don't contain champion data
+        champion_divs = [div for div in champion_divs if div.get('onmouseover') and 'setBg' in div.get('onmouseover')]
+        
+        for div in champion_divs:
+            # Extract champion name
+            champion_name = div.get('class')[0]
+            
+            # Extract percentage value
+            percentage_text = div.text.strip()
+            percentage_match = re.search(r'(\d+)%', percentage_text)
+            percentage = int(percentage_match.group(1)) if percentage_match else None
+            
+            # Get the champion ID from the URL
+            link = div.find('a')
+            if link:
+                champion_id_match = re.search(r'/champion-stats/(\d+)/', link.get('href'))
+                champion_id = champion_id_match.group(1) if champion_id_match else None
+            else:
+                champion_id = None
+            
+            all_champions_data.append({
+                'name': champion_name,
+                'percentage': percentage,
+                'id': champion_id,
+                'patch': patch
+            })
+    
+    # Convert to DataFrame
+    df = pd.DataFrame(all_champions_data)
+    return df
 
 def main():
-    c_url = GOLGG_BASE_URL + GOL_GG_PICKBAN_BY_PATCH_ENDPOINT + GOL_GG_SEASON_SPLIT_URL_GEN(15, Split.WINTER)
+    c_url = GOLGG_BASE_URL + GOL_GG_PICKBAN_BY_PATCH_ENDPOINT + GOL_GG_SEASON_SPLIT_URL_GEN(14, Split.SUMMER)
     df = scrape_pick_ban_by_patch(c_url)
     print(df)
-    df.to_csv("pick_ban_by_patch.csv", index=False)
-
+    df.to_csv(f"pick_ban_by_patch_s14Summer.csv", index=False)
+    
 if __name__ == "__main__":
     main()
