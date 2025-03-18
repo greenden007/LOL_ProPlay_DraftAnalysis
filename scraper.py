@@ -88,10 +88,10 @@ def scrape_pick_ban_by_patch(url: str) -> pd.DataFrame:
     return df
 
 def main():
-    c_url = GOLGG_BASE_URL + GOL_GG_PICKBAN_BY_PATCH_ENDPOINT + GOL_GG_SEASON_SPLIT_URL_GEN(14, Split.SUMMER)
+    c_url = GOLGG_BASE_URL + GOL_GG_PICKBAN_BY_PATCH_ENDPOINT + GOL_GG_SEASON_SPLIT_URL_GEN(12, Split.SPRING)
     df = scrape_pick_ban_by_patch(c_url)
     print(df)
-    df.to_csv(f"pick_ban_by_patch_s14Summer.csv", index=False)
+    df.to_csv(f"pick_ban_by_patch_s12Spring.csv", index=False)
     
 if __name__ == "__main__":
     main()
