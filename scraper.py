@@ -7,8 +7,10 @@ import time
 
 GOLGG_BASE_URL = "https://gol.gg/"
 GOLGG_TOURNAMENT_ENDPOINT = "tournament/list/"
+GOLGG_TOURNAMENT_SERIES_ENDPOINT = "tournament/tournament-matchlist/"
 GOL_GG_BANS_ENDPOINT = "champion/bans-stats/"
 GOL_GG_PICKBAN_BY_PATCH_ENDPOINT = "stats/patches-by-patches/"
+
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
 }
@@ -18,6 +20,9 @@ class Split(enum.Enum):
     SUMMER = "split-Summer/"
     SPRING = "split-Spring/"
     ALL = "split-ALL/"
+
+def GOL_GG_GAME_ENDPOINT_GEN(game_code: int) -> str:
+    return f"game/stats/{game_code}/page-game/"
 
 def GOL_GG_SEASON_SPLIT_URL_GEN(season: int, split: Split):
     return f"season-S{season}/{split.value}"
@@ -87,11 +92,122 @@ def scrape_pick_ban_by_patch(url: str) -> pd.DataFrame:
     df = pd.DataFrame(all_champions_data)
     return df
 
+def get_all_games_from_tournament(tournament_url_endpoint: str) -> list[str]:
+    upd_url = GOLGG_BASE_URL + GOLGG_TOURNAMENT_SERIES_ENDPOINT + tournament_url_endpoint
+    try:
+        response = requests.get(upd_url, headers=HEADERS)
+        response.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        print(f"Error: {e}")
+        return []
+    
+    soup = BeautifulSoup(response.content, 'html.parser')
+    
+    match_links = []
+
+    # Find all 'a' tags within the table containing match information
+    table = soup.find('table')
+    if table:
+        for a_tag in table.find_all('a', href=True):
+            href = a_tag['href']
+            if href.startswith('../game/stats/'):
+                full_url = f"https://gol.gg{href[2:]}"
+                match_links.append(full_url)
+    else:
+        print("Match table not found on the page.")
+
+    return match_links
+    
+def collect_matches_from_game(url: str) -> list[str]:
+    try:
+        response = requests.get(url, headers=HEADERS)
+        response.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        print(f"Error: {e}")
+        return []
+    
+    soup = BeautifulSoup(response.content, 'html.parser')
+
+    match_links = []
+
+    # Find length of series (Bo1, Bo3, or Bo5)
+
+def scrape_teams_side_winner_from_game(html_content: str):
+    soup = BeautifulSoup(html_content, 'html.parser')
+    
+    # Find the winner/loser and the team that was blue/red
+    blue_side_div = soup.find('div', class_='col-12 blue-line-header')
+    if not blue_side_div:
+        return None
+    blue_side_team = blue_side_div.find('a').text.strip()
+
+    red_side_div = soup.find('div', class_='col-12 red-line-header')
+    if not red_side_div:
+        return None
+    red_side_team = red_side_div.find('a').text.strip()
+    
+    blue_side_lost = 'LOSS' in blue_side_div.text
+    winner = red_side_team if blue_side_lost else blue_side_team
+
+    return {
+        "blue_side": blue_side_team,
+        "red_side": red_side_team,
+        "winner": winner,
+        "loser": red_side_team if not blue_side_lost else blue_side_team
+    }
+
+def scrape_draft_from_game(html_content: str) -> pd.DataFrame:
+    soup = BeautifulSoup(html_content, 'html.parser')
+
+    section_divs = soup.find_all("div", class_="col-2")
+    bans = []
+    picks = []
+    section_name = ["Bans", "Picks"]
+    for div in section_divs:
+        if div.text.strip() == section_name[0]:
+            champions_div = div.find_next_sibling("div", class_="col-10")
+            bans.extend(
+                img["alt"] for img in champions_div.find_all("img", class_="champion_icon_medium")
+            )
+        elif div.text.strip() == section_name[1]:
+            champions_div = div.find_next_sibling("div", class_="col-10")
+            picks.extend(
+                img["alt"] for img in champions_div.find_all("img", class_="champion_icon_medium")
+            )
+
+    # Clean data by organizing picks and bans by team
+    blue_bans = bans[:len(bans)//2]
+    red_bans = bans[len(bans)//2:]
+    blue_picks = picks[:len(picks)//2]
+    red_picks = picks[len(picks)//2:]
+    
+    return pd.DataFrame({"blue_bans": blue_bans, "red_bans": red_bans, "blue_picks": blue_picks, "red_picks": red_picks})
+
+
+
 def main():
-    c_url = GOLGG_BASE_URL + GOL_GG_PICKBAN_BY_PATCH_ENDPOINT + GOL_GG_SEASON_SPLIT_URL_GEN(12, Split.SPRING)
-    df = scrape_pick_ban_by_patch(c_url)
-    print(df)
-    df.to_csv(f"pick_ban_by_patch_s12Spring.csv", index=False)
+    # c_url = GOLGG_BASE_URL + GOL_GG_PICKBAN_BY_PATCH_ENDPOINT + GOL_GG_SEASON_SPLIT_URL_GEN(12, Split.SPRING)
+    # df = scrape_pick_ban_by_patch(c_url)
+    # print(df)
+    # df.to_csv(f"pick_ban_by_patch_s12Spring.csv", index=False)
+
+    # tourney = "First Stand 2025/"
+    # ff = get_all_games_from_tournament(tourney)
+
+    game = GOLGG_BASE_URL + GOL_GG_GAME_ENDPOINT_GEN(64982)
+    print(game)
+    
+    # with open("game.html", "w") as f:
+    #     f.write(requests.get(game, headers=HEADERS).text)
+    
+    with open("game.html", "r") as f:
+        html_content = f.read()
+    
+    draft = scrape_draft_from_game(html_content)
+    print(draft)
+    
+    teams = scrape_teams_side_winner_from_game(html_content)
+    print(teams)
     
 if __name__ == "__main__":
     main()
