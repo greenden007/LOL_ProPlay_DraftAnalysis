@@ -1,4 +1,5 @@
 import enum
+from turtle import title
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
@@ -118,19 +119,26 @@ def get_all_games_from_tournament(tournament_url_endpoint: str) -> list[str]:
 
     return match_links
     
-def collect_matches_from_game(url: str) -> list[str]:
-    try:
-        response = requests.get(url, headers=HEADERS)
-        response.raise_for_status()
-    except requests.exceptions.RequestException as e:
-        print(f"Error: {e}")
-        return []
+def collect_matches_from_game(html_content: str, base_url: str) -> list[str]:
+    soup = BeautifulSoup(html_content, 'html.parser')
+
+    #TODO: Find length of series (Bo1, Bo3, or Bo5)
+    game_links = []
+    game_nav = soup.find('div', id='gameMenuToggler')
+
+    if game_nav:
+        game_items = game_nav.find_all('li', class_=re.compile(r'game-menu-button(-active)?$'))
+
+        for item in game_items:
+            link = item.find('a', title=re.compile(r'Game \d+'))
+            print(link)
+            if link:
+                game_links.append({
+                    'game_number': link.text.strip(),
+                    'url': link['href'],
+                })
     
-    soup = BeautifulSoup(response.content, 'html.parser')
-
-    match_links = []
-
-    # Find length of series (Bo1, Bo3, or Bo5)
+    return game_links
 
 def scrape_teams_side_winner_from_game(html_content: str):
     soup = BeautifulSoup(html_content, 'html.parser')
@@ -194,7 +202,7 @@ def main():
     # tourney = "First Stand 2025/"
     # ff = get_all_games_from_tournament(tourney)
 
-    game = GOLGG_BASE_URL + GOL_GG_GAME_ENDPOINT_GEN(64982)
+    game = GOLGG_BASE_URL + GOL_GG_GAME_ENDPOINT_GEN(64957)
     print(game)
     
     # with open("game.html", "w") as f:
@@ -203,11 +211,14 @@ def main():
     with open("game.html", "r") as f:
         html_content = f.read()
     
-    draft = scrape_draft_from_game(html_content)
-    print(draft)
+    # draft = scrape_draft_from_game(html_content)
+    # print(draft)
     
-    teams = scrape_teams_side_winner_from_game(html_content)
-    print(teams)
+    # teams = scrape_teams_side_winner_from_game(html_content)
+    # print(teams)
+
+    game_links = collect_matches_from_game(html_content, game)
+    print(game_links)
     
 if __name__ == "__main__":
     main()
