@@ -93,16 +93,8 @@ def scrape_pick_ban_by_patch(url: str) -> pd.DataFrame:
     df = pd.DataFrame(all_champions_data)
     return df
 
-def get_all_games_from_tournament(tournament_url_endpoint: str) -> list[str]:
-    upd_url = GOLGG_BASE_URL + GOLGG_TOURNAMENT_SERIES_ENDPOINT + tournament_url_endpoint
-    try:
-        response = requests.get(upd_url, headers=HEADERS)
-        response.raise_for_status()
-    except requests.exceptions.RequestException as e:
-        print(f"Error: {e}")
-        return []
-    
-    soup = BeautifulSoup(response.content, 'html.parser')
+def get_all_games_from_tournament(html_content: str) -> list[str]:
+    soup = BeautifulSoup(html_content, 'html.parser')
     
     match_links = []
 
@@ -119,7 +111,7 @@ def get_all_games_from_tournament(tournament_url_endpoint: str) -> list[str]:
 
     return match_links
     
-def collect_matches_from_game(html_content: str, base_url: str) -> list[str]:
+def collect_matches_from_game(html_content: str) -> list[str]:
     soup = BeautifulSoup(html_content, 'html.parser')
 
     #TODO: Find length of series by looking at game menu - return links to each match
@@ -188,6 +180,44 @@ def collect_match_patch(html_content: str) -> str:
     if patch_div:
         return patch_div.text.strip()[1:]
     return None
+
+def scrape_full_tournament(tourney_url_endpoint: str):
+    upd_url = GOLGG_BASE_URL + GOLGG_TOURNAMENT_SERIES_ENDPOINT + tourney_url_endpoint
+    try:
+        response = requests.get(upd_url, headers=HEADERS)
+        response.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        print(f"Error: {e}")
+        return []
+
+    df = pd.DataFrame()
+    
+    ln = get_all_games_from_tournament(response.text)
+    for link in ln:
+        try:
+            game_response = requests.get(link, headers=HEADERS)
+            game_response.raise_for_status()
+        except requests.exceptions.RequestException as e:
+            print(f"Error: {e}")
+            continue
+        game_html = game_response.text
+        series_games = collect_matches_from_game(game_html)
+        new_data = scrape_draft_from_game(game_html)
+        new_data["patch"] = collect_match_patch(game_html)
+        df = pd.concat([df, new_data], ignore_index=True)
+
+        for link_x in series_games:
+            try:
+                game_response = requests.get(link_x, headers=HEADERS)
+                game_response.raise_for_status()
+            except requests.exceptions.RequestException as e:
+                print(f"Error: {e}")
+                continue
+            game_html = game_response.text
+            new_data = scrape_draft_from_game(game_html)
+            new_data["patch"] = collect_match_patch(game_html)
+            df = pd.concat([df, new_data], ignore_index=True)
+    return df
 
 def main():
     # c_url = GOLGG_BASE_URL + GOL_GG_PICKBAN_BY_PATCH_ENDPOINT + GOL_GG_SEASON_SPLIT_URL_GEN(12, Split.SPRING)
