@@ -120,32 +120,34 @@ def collect_matches_from_game(html_content: str) -> list[str]:
     for link in soup.select(".game-menu-button a.nav-link"):
         href = link.get('href')
         if href and 'page-game' in href:
-            match_links.append(f"{GOLGG_BASE_URL}{href[3:]}")
+            match_links.append(f"{GOLGG_BASE_URL}{href.lstrip('../')}")
     return match_links
 
-def scrape_teams_side_winner_from_game(html_content: str):
+def scrape_teams_side_winner_from_game(html_content: str) -> pd.DataFrame:
     soup = BeautifulSoup(html_content, 'html.parser')
     
     # Find the winner/loser and the team that was blue/red
     blue_side_div = soup.find('div', class_='col-12 blue-line-header')
     if not blue_side_div:
-        return None
+        return pd.DataFrame()
     blue_side_team = blue_side_div.find('a').text.strip()
 
     red_side_div = soup.find('div', class_='col-12 red-line-header')
     if not red_side_div:
-        return None
+        return pd.DataFrame()
     red_side_team = red_side_div.find('a').text.strip()
     
     blue_side_lost = 'LOSS' in blue_side_div.text
     winner = red_side_team if blue_side_lost else blue_side_team
 
-    return {
+    temp = {
         "blue_side": blue_side_team,
         "red_side": red_side_team,
         "winner": winner,
         "loser": red_side_team if not blue_side_lost else blue_side_team
     }
+
+    return pd.DataFrame([temp])
 
 def scrape_draft_from_game(html_content: str) -> pd.DataFrame:
     soup = BeautifulSoup(html_content, 'html.parser')
@@ -184,15 +186,15 @@ def collect_match_patch(html_content: str) -> str:
 def scrape_full_tournament(tourney_url_endpoint: str):
     upd_url = GOLGG_BASE_URL + GOLGG_TOURNAMENT_SERIES_ENDPOINT + tourney_url_endpoint
     try:
-        response = requests.get(upd_url, headers=HEADERS)
-        response.raise_for_status()
+        res = requests.get(upd_url, headers=HEADERS)
+        res.raise_for_status()
     except requests.exceptions.RequestException as e:
         print(f"Error: {e}")
         return []
 
     df = pd.DataFrame()
     
-    ln = get_all_games_from_tournament(response.text)
+    ln = get_all_games_from_tournament(res.text)
     for link in ln:
         try:
             game_response = requests.get(link, headers=HEADERS)
@@ -204,6 +206,7 @@ def scrape_full_tournament(tourney_url_endpoint: str):
         series_games = collect_matches_from_game(game_html)
         new_data = scrape_draft_from_game(game_html)
         new_data["patch"] = collect_match_patch(game_html)
+        new_data = pd.concat([new_data, scrape_teams_side_winner_from_game(game_html)], ignore_index=True)
         df = pd.concat([df, new_data], ignore_index=True)
 
         for link_x in series_games:
@@ -216,6 +219,7 @@ def scrape_full_tournament(tourney_url_endpoint: str):
             game_html = game_response.text
             new_data = scrape_draft_from_game(game_html)
             new_data["patch"] = collect_match_patch(game_html)
+            new_data = pd.concat([new_data, scrape_teams_side_winner_from_game(game_html)], ignore_index=True)
             df = pd.concat([df, new_data], ignore_index=True)
     return df
 
@@ -226,28 +230,24 @@ def main():
     # df.to_csv(f"pick_ban_by_patch_s12Spring.csv", index=False)
 
     # tourney = "First Stand 2025/"
-    # ff = get_all_games_from_tournament(tourney)
+    # df = scrape_full_tournament(f"{GOLGG_BASE_URL}{GOLGG_TOURNAMENT_SERIES_ENDPOINT}{tourney}")
+    # print(df)
+    # df.to_csv(f"drafts_s15Spring.csv", index=False)
+    
+    # tourney = "First Stand 2025/"
+    # try:
+    #     res = requests.get(f"{GOLGG_BASE_URL}{GOLGG_TOURNAMENT_SERIES_ENDPOINT}{tourney}", headers=HEADERS)
+    #     res.raise_for_status()
+    # except requests.exceptions.RequestException as e:
+    #     print(f"Error: {e}")
+    #     return
+        
+    # print(get_all_games_from_tournament(res.text))
 
-    game = GOLGG_BASE_URL + GOL_GG_GAME_ENDPOINT_GEN(64957)
-    print(game)
+    df = scrape_full_tournament("First Stand 2025/")
     
-    # with open("game.html", "w") as f:
-    #     f.write(requests.get(game, headers=HEADERS).text)
-    
-    with open("game.html", "r") as f:
-        html_content = f.read()
-    
-    # draft = scrape_draft_from_game(html_content)
-    # print(draft)
-    
-    # teams = scrape_teams_side_winner_from_game(html_content)
-    # print(teams)
-
-    # patch = collect_match_patch(html_content)
-    # print(patch)
-
-    game_links = collect_matches_from_game(html_content, game)
-    print(game_links)
+    df.to_csv(f"drafts_FirstStand2025.csv", index=False)
+    print(df)
     
 if __name__ == "__main__":
     main()
