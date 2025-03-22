@@ -138,13 +138,20 @@ def scrape_teams_side_winner_from_game(html_content: str) -> pd.DataFrame:
     red_side_team = red_side_div.find('a').text.strip()
     
     blue_side_lost = 'LOSS' in blue_side_div.text
-    winner = red_side_team if blue_side_lost else blue_side_team
+    winner = ""
+    loser = ""
+    if blue_side_lost:
+        winner = "red_side"
+        loser = "blue_side"
+    else:
+        winner = "blue_side"
+        loser = "red_side"
 
     temp = {
         "blue_side": blue_side_team,
         "red_side": red_side_team,
         "winner": winner,
-        "loser": red_side_team if not blue_side_lost else blue_side_team
+        "loser": loser
     }
 
     return pd.DataFrame([temp])
