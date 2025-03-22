@@ -122,23 +122,14 @@ def get_all_games_from_tournament(tournament_url_endpoint: str) -> list[str]:
 def collect_matches_from_game(html_content: str, base_url: str) -> list[str]:
     soup = BeautifulSoup(html_content, 'html.parser')
 
-    #TODO: Find length of series (Bo1, Bo3, or Bo5)
-    game_links = []
-    game_nav = soup.find('div', id='gameMenuToggler')
+    #TODO: Find length of series by looking at game menu - return links to each match
+    match_links = []
 
-    if game_nav:
-        game_items = game_nav.find_all('li', class_=re.compile(r'game-menu-button(-active)?$'))
-
-        for item in game_items:
-            link = item.find('a', title=re.compile(r'Game \d+'))
-            print(link)
-            if link:
-                game_links.append({
-                    'game_number': link.text.strip(),
-                    'url': link['href'],
-                })
-    
-    return game_links
+    for link in soup.select(".game-menu-button a.nav-link"):
+        href = link.get('href')
+        if href and 'page-game' in href:
+            match_links.append(f"{GOLGG_BASE_URL}{href[3:]}")
+    return match_links
 
 def scrape_teams_side_winner_from_game(html_content: str):
     soup = BeautifulSoup(html_content, 'html.parser')
@@ -191,7 +182,12 @@ def scrape_draft_from_game(html_content: str) -> pd.DataFrame:
     
     return pd.DataFrame({"blue_bans": blue_bans, "red_bans": red_bans, "blue_picks": blue_picks, "red_picks": red_picks})
 
-
+def collect_match_patch(html_content: str) -> str:
+    soup = BeautifulSoup(html_content, 'html.parser')
+    patch_div = soup.find('div', class_='col-3 text-right')
+    if patch_div:
+        return patch_div.text.strip()[1:]
+    return None
 
 def main():
     # c_url = GOLGG_BASE_URL + GOL_GG_PICKBAN_BY_PATCH_ENDPOINT + GOL_GG_SEASON_SPLIT_URL_GEN(12, Split.SPRING)
@@ -216,6 +212,9 @@ def main():
     
     # teams = scrape_teams_side_winner_from_game(html_content)
     # print(teams)
+
+    # patch = collect_match_patch(html_content)
+    # print(patch)
 
     game_links = collect_matches_from_game(html_content, game)
     print(game_links)
