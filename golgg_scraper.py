@@ -284,12 +284,12 @@ def full_season_tourney_list(season: int) -> list[str]:
 
 def main():
 
-    for season in range(10, 12):
-        for split in [Split.SPRING, Split.SUMMER, Split.WINTER]:
-            c_url = GOLGG_BASE_URL + GOL_GG_PICKBAN_BY_PATCH_ENDPOINT + GOL_GG_SEASON_SPLIT_URL_GEN(season, split)
-            df = scrape_pick_ban_by_patch(c_url)
-            print(df)
-            df.to_csv(f"pick_ban_by_patch_s{season}{split.name.lower().capitalize()}.csv", index=False)
+    # for season in range(10, 12):
+    #     for split in [Split.SPRING, Split.SUMMER, Split.WINTER]:
+    #         c_url = GOLGG_BASE_URL + GOL_GG_PICKBAN_BY_PATCH_ENDPOINT + GOL_GG_SEASON_SPLIT_URL_GEN(season, split)
+    #         df = scrape_pick_ban_by_patch(c_url)
+    #         print(df)
+    #         df.to_csv(f"pick_ban_by_patch_s{season}{split.name.lower().capitalize()}.csv", index=False)
 
     # tourney = "First Stand 2025/"
     # df = scrape_full_tournament(f"{GOLGG_BASE_URL}{GOLGG_TOURNAMENT_SERIES_ENDPOINT}{tourney}")
@@ -316,6 +316,14 @@ def main():
     #     with open(f"tournaments_s{season}.txt", "w") as f:
     #         for tourney in data:
     #             f.write(f"{tourney}\n")
+
+    for s_num in range(11, 15):
+        with open (f"tournaments_s{s_num}.txt", "r") as f:
+            tourneys = f.readlines()
+        
+        for tourney in tourneys:
+            df = scrape_full_tournament(f"{tourney.strip()}/")
+            df.to_csv(f"drafts_s{s_num}_{tourney.strip()}.csv", index=False)
     
 if __name__ == "__main__":
     main()
