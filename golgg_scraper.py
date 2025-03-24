@@ -11,9 +11,27 @@ GOLGG_TOURNAMENT_ENDPOINT = "tournament/list/"
 GOLGG_TOURNAMENT_SERIES_ENDPOINT = "tournament/tournament-matchlist/"
 GOL_GG_BANS_ENDPOINT = "champion/bans-stats/"
 GOL_GG_PICKBAN_BY_PATCH_ENDPOINT = "stats/patches-by-patches/"
+GOLGG_PHP_URL = "https://gol.gg/tournament/ajax.trlist.php"
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
+}
+HEADER_DETAILED = {
+    "Host": "gol.gg",
+    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:136.0) Gecko/20100101 Firefox/136.0",
+    "Accept": "application/json, text/javascript, */*; q=0.01",
+    "Accept-Language": "en-US,en;q=0.5",
+    "Accept-Encoding": "gzip, deflate, br, zstd",
+    "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+    "X-Requested-With": "XMLHttpRequest",
+    "Origin": "https://gol.gg",
+    "Connection": "keep-alive",
+    "Referer": "https://gol.gg/tournament/list/",
+    "Cookie": "",
+    "Sec-Fetch-Dest": "empty",
+    "Sec-Fetch-Mode": "cors",
+    "Sec-Fetch-Site": "same-origin",
+    "Priority": "u=0"
 }
 
 class Split(enum.Enum):
@@ -27,6 +45,12 @@ def GOL_GG_GAME_ENDPOINT_GEN(game_code: int) -> str:
 
 def GOL_GG_SEASON_SPLIT_URL_GEN(season: int, split: Split):
     return f"season-S{season}/{split.value}"
+
+def GOL_GG_PAYLOAD_GEN(season:int) -> str:
+    return {
+        "season": f"S{season}",
+        "league[]": ["EWC", "First Stand", "IEM", "LCK", "LCP", "LCS", "LEC", "LMS", "LPL", "LTA", "LTA North", "MSC", "MSI", "WORLDS"]
+    }
 
 def scrape_pick_ban_by_patch(url: str) -> pd.DataFrame:
     """
@@ -245,11 +269,27 @@ def scrape_full_tournament(tourney_url_endpoint: str):
             df = pd.concat([df, new_data], ignore_index=True)
     return df
 
+def full_season_tourney_list(season: int) -> list[str]:
+    try:
+        res = requests.post(GOLGG_PHP_URL, headers=HEADER_DETAILED, data=GOL_GG_PAYLOAD_GEN(season))
+        res.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        print(f"Error: {e}")
+        return []
+    
+    tourneys = res.json()
+
+    tourney_names = [tourney['trname'] for tourney in tourneys]
+    return tourney_names
+
 def main():
-    # c_url = GOLGG_BASE_URL + GOL_GG_PICKBAN_BY_PATCH_ENDPOINT + GOL_GG_SEASON_SPLIT_URL_GEN(12, Split.SPRING)
-    # df = scrape_pick_ban_by_patch(c_url)
-    # print(df)
-    # df.to_csv(f"pick_ban_by_patch_s12Spring.csv", index=False)
+
+    for season in range(10, 12):
+        for split in [Split.SPRING, Split.SUMMER, Split.WINTER]:
+            c_url = GOLGG_BASE_URL + GOL_GG_PICKBAN_BY_PATCH_ENDPOINT + GOL_GG_SEASON_SPLIT_URL_GEN(season, split)
+            df = scrape_pick_ban_by_patch(c_url)
+            print(df)
+            df.to_csv(f"pick_ban_by_patch_s{season}{split.name}.csv", index=False)
 
     # tourney = "First Stand 2025/"
     # df = scrape_full_tournament(f"{GOLGG_BASE_URL}{GOLGG_TOURNAMENT_SERIES_ENDPOINT}{tourney}")
@@ -266,11 +306,16 @@ def main():
         
     # print(get_all_games_from_tournament(res.text))
 
-    df = scrape_full_tournament("First Stand 2025/")
+    # df = scrape_full_tournament("First Stand 2025/")
     
-    df.to_csv(f"drafts_FirstStand2025.csv", index=False)
-    print(df)
+    # df.to_csv(f"drafts_FirstStand2025.csv", index=False)
+    # print(df)
 
+    # for season in range(14, 15):
+    #     data = full_season_tourney_list(season)
+    #     with open(f"tournaments_s{season}.txt", "w") as f:
+    #         for tourney in data:
+    #             f.write(f"{tourney}\n")
     
 if __name__ == "__main__":
     main()
