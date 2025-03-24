@@ -289,7 +289,7 @@ def main():
             c_url = GOLGG_BASE_URL + GOL_GG_PICKBAN_BY_PATCH_ENDPOINT + GOL_GG_SEASON_SPLIT_URL_GEN(season, split)
             df = scrape_pick_ban_by_patch(c_url)
             print(df)
-            df.to_csv(f"pick_ban_by_patch_s{season}{split.name}.csv", index=False)
+            df.to_csv(f"pick_ban_by_patch_s{season}{split.name.lower().capitalize()}.csv", index=False)
 
     # tourney = "First Stand 2025/"
     # df = scrape_full_tournament(f"{GOLGG_BASE_URL}{GOLGG_TOURNAMENT_SERIES_ENDPOINT}{tourney}")
