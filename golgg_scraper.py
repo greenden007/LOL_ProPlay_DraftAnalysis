@@ -190,6 +190,18 @@ def collect_match_patch(html_content: str) -> str:
         return patch_div.text.strip()[1:]
     return None
 
+def collect_roster_from_match(html_content: str) -> pd.DataFrame:
+    soup = BeautifulSoup(html_content, 'html.parser')
+
+    player_links = soup.find_all('a', class_='link-blanc')
+    player_names = [link.get_text(strip=True) for link in player_links]
+    df = pd.DataFrame()
+    df['Blue Side Roster'] = player_names[:len(player_names)//2]
+    df['Red Side Roster'] = player_names[len(player_names)//2:]
+
+    return df
+        
+
 def scrape_full_tournament(tourney_url_endpoint: str):
     upd_url = GOLGG_BASE_URL + GOLGG_TOURNAMENT_SERIES_ENDPOINT + tourney_url_endpoint
     try:
@@ -226,6 +238,9 @@ def scrape_full_tournament(tourney_url_endpoint: str):
             game_html = game_response.text
             new_data = scrape_draft_from_game(game_html)
             new_data["patch"] = collect_match_patch(game_html)
+            rosters = collect_roster_from_match(game_html)
+            new_data["Blue Side Roster"] = rosters["Blue Side Roster"]
+            new_data["Red Side Roster"] = rosters["Red Side Roster"]
             new_data = pd.concat([new_data, scrape_teams_side_winner_from_game(game_html)], ignore_index=True)
             df = pd.concat([df, new_data], ignore_index=True)
     return df
@@ -255,6 +270,7 @@ def main():
     
     df.to_csv(f"drafts_FirstStand2025.csv", index=False)
     print(df)
+
     
 if __name__ == "__main__":
     main()
