@@ -269,7 +269,7 @@ def scrape_full_tournament(tourney_url_endpoint: str):
 
 def full_season_tourney_list(season: int) -> list[str]:
     try:
-        res = requests.post(GOLGG_PHP_URL, headers=HEADER_DETAILED, data=GOL_GG_PAYLOAD_GEN(season))
+        res = requests.post(GOLGG_PHP_URL, headers=HEADER_DETAILED, data=GOL_GG_PAYLOAD_GEN(season), timeout=15)
         res.raise_for_status()
     except requests.exceptions.RequestException as e:
         print(f"Error: {e}")
