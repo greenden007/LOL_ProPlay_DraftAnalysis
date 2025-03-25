@@ -423,7 +423,6 @@ def main():
     #         df = scrape_full_tournament(f"{tourney.strip()}/")
     #         df.to_csv(f"drafts_s{s_num}_{tourney.strip()}.csv", index=False)
 
-    pass
 
 if __name__ == "__main__":
     main()
