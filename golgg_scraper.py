@@ -1,10 +1,8 @@
 import enum
-from turtle import title
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 import re
-import time
 
 GOLGG_BASE_URL = "https://gol.gg/"
 GOLGG_TOURNAMENT_ENDPOINT = "tournament/list/"
@@ -317,13 +315,17 @@ def main():
     #         for tourney in data:
     #             f.write(f"{tourney}\n")
 
-    for s_num in range(11, 15):
-        with open (f"tournaments_s{s_num}.txt", "r") as f:
-            tourneys = f.readlines()
+
+    # TODO: DO NOT DO NOT DO NOT TURN THIS ON UNLESS ABSOLUTELY NECESSARY
+    # for s_num in range(11, 15):
+    #     with open (f"tournaments_s{s_num}.txt", "r") as f:ß
+    #         tourneys = f.readlines()
         
-        for tourney in tourneys:
-            df = scrape_full_tournament(f"{tourney.strip()}/")
-            df.to_csv(f"drafts_s{s_num}_{tourney.strip()}.csv", index=False)
+    #     for tourney in tourneys:
+    #         df = scrape_full_tournament(f"{tourney.strip()}/")
+    #         df.to_csv(f"drafts_s{s_num}_{tourney.strip()}.csv", index=False)
+
+    pass
     
 if __name__ == "__main__":
     main()
