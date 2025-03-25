@@ -61,7 +61,7 @@ def scrape_pick_ban_by_patch(url: str) -> pd.DataFrame:
         pd.DataFrame: A DataFrame containing the pick/ban data.
     """
     try:
-        response = requests.get(url, headers=HEADERS)
+        response = requests.get(url, headers=HEADERS, timeout=15)
         response.raise_for_status()
     except requests.exceptions.RequestException as e:
         print(f"Error: {e}")
@@ -227,7 +227,7 @@ def collect_roster_from_match(html_content: str) -> pd.DataFrame:
 def scrape_full_tournament(tourney_url_endpoint: str):
     upd_url = GOLGG_BASE_URL + GOLGG_TOURNAMENT_SERIES_ENDPOINT + tourney_url_endpoint
     try:
-        res = requests.get(upd_url, headers=HEADERS)
+        res = requests.get(upd_url, headers=HEADERS, timeout=15)
         res.raise_for_status()
     except requests.exceptions.RequestException as e:
         print(f"Error: {e}")
@@ -238,7 +238,7 @@ def scrape_full_tournament(tourney_url_endpoint: str):
     ln = get_all_games_from_tournament(res.text)
     for link in ln:
         try:
-            game_response = requests.get(link, headers=HEADERS)
+            game_response = requests.get(link, headers=HEADERS, timeout=15)
             game_response.raise_for_status()
         except requests.exceptions.RequestException as e:
             print(f"Error: {e}")
@@ -252,7 +252,7 @@ def scrape_full_tournament(tourney_url_endpoint: str):
 
         for link_x in series_games:
             try:
-                game_response = requests.get(link_x, headers=HEADERS)
+                game_response = requests.get(link_x, headers=HEADERS, timeout=15)
                 game_response.raise_for_status()
             except requests.exceptions.RequestException as e:
                 print(f"Error: {e}")
