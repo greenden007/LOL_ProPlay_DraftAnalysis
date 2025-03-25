@@ -20,4 +20,4 @@ jobs:
         pip install pylint requests beautifulsoup4 pandas
     - name: Analysing the code with pylint
       run: |
-        pylint --disable=W0611 --exit-zero $(git ls-files '*.py')
+        pylint --disable=W0611 --fail-under=10 $(git ls-files '*.py')
