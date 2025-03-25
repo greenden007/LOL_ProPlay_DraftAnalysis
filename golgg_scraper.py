@@ -1,8 +1,8 @@
+import re
 import enum
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
-import re
 
 GOLGG_BASE_URL = "https://gol.gg/"
 GOLGG_TOURNAMENT_ENDPOINT = "tournament/list/"
@@ -33,21 +33,53 @@ HEADER_DETAILED = {
 }
 
 class Split(enum.Enum):
+    """
+    Enum for split types.
+    """
     WINTER = "split-Winter/"
     SUMMER = "split-Summer/"
     SPRING = "split-Spring/"
     ALL = "split-ALL/"
 
 def GOL_GG_GAME_ENDPOINT_GEN(game_code: int) -> str:
+    """
+    Generates the URL for a game on gol.gg.
+
+    Args:
+        game_code (int): The game code.
+
+    Returns:
+        str: The URL for the game.
+    """
     return f"game/stats/{game_code}/page-game/"
 
 def GOL_GG_SEASON_SPLIT_URL_GEN(season: int, split: Split):
+    """
+    Generates the URL for a season and split on gol.gg.
+
+    Args:
+        season (int): The season.
+        split (Split): The split.
+
+    Returns:
+        str: The URL for the season and split.
+    """
     return f"season-S{season}/{split.value}"
 
 def GOL_GG_PAYLOAD_GEN(season:int) -> str:
+    """
+    Generates the payload for a season on gol.gg.
+
+    Args:
+        season (int): The season.
+
+    Returns:
+        str: The payload for the season.
+    """
     return {
         "season": f"S{season}",
-        "league[]": ["EWC", "First Stand", "IEM", "LCK", "LCP", "LCS", "LEC", "LMS", "LPL", "LTA", "LTA North", "MSC", "MSI", "WORLDS"]
+        "league[]": ["EWC", "First Stand", "IEM", "LCK", "LCP", "LCS", "LEC", "LMS", "LPL", "LTA", 
+        "LTA North", "MSC", "MSI", "WORLDS"]
     }
 
 def scrape_pick_ban_by_patch(url: str) -> pd.DataFrame:
@@ -68,34 +100,34 @@ def scrape_pick_ban_by_patch(url: str) -> pd.DataFrame:
         return pd.DataFrame()
 
     soup = BeautifulSoup(response.content, 'html.parser')
-    
+
     headers = soup.find_all('th')
     patch_headers = [header.text.strip() for header in headers]
-    
+
     # Find all table cells
     cells = soup.find_all('td', {'style': 'vertical-align:top'})
-    
+
     all_champions_data = []
-    
+
     # Process each cell (corresponds to a patch)
     for i, cell in enumerate(cells):
         patch = patch_headers[i] if i < len(patch_headers) else f"Unknown_Patch_{i}"
-        
+
         # Find all champion divs in this cell
         champion_divs = cell.find_all('div', {'class': re.compile(r'[A-Za-z]')})
-        
+
         # Filter out divs that don't contain champion data
         champion_divs = [div for div in champion_divs if div.get('onmouseover') and 'setBg' in div.get('onmouseover')]
-        
+
         for div in champion_divs:
             # Extract champion name
             champion_name = div.get('class')[0]
-            
+
             # Extract percentage value
             percentage_text = div.text.strip()
             percentage_match = re.search(r'(\d+)%', percentage_text)
             percentage = int(percentage_match.group(1)) if percentage_match else None
-            
+
             # Get the champion ID from the URL
             link = div.find('a')
             if link:
@@ -103,21 +135,30 @@ def scrape_pick_ban_by_patch(url: str) -> pd.DataFrame:
                 champion_id = champion_id_match.group(1) if champion_id_match else None
             else:
                 champion_id = None
-            
+
             all_champions_data.append({
                 'name': champion_name,
                 'percentage': percentage,
                 'id': champion_id,
                 'patch': patch
             })
-    
+
     # Convert to DataFrame
     df = pd.DataFrame(all_champions_data)
     return df
 
 def get_all_games_from_tournament(html_content: str) -> list[str]:
+    """
+    Scrapes the URL of all games from a tournament page.
+
+    Args:
+        html_content (str): The HTML content of the tournament page.
+
+    Returns:
+        list[str]: A list of URLs for all games in the tournament.
+    """
     soup = BeautifulSoup(html_content, 'html.parser')
-    
+
     match_links = []
 
     # Find all 'a' tags within the table containing match information
@@ -146,8 +187,17 @@ def collect_matches_from_game(html_content: str) -> list[str]:
     return match_links
 
 def scrape_teams_side_winner_from_game(html_content: str) -> pd.DataFrame:
+    """
+    Scrapes the winner/loser and the team that was blue/red from a game page.
+
+    Args:
+        html_content (str): The HTML content of the game page.
+
+    Returns:
+        pd.DataFrame: A DataFrame containing the winner/loser and the team that was blue/red.
+    """
     soup = BeautifulSoup(html_content, 'html.parser')
-    
+
     # Find the winner/loser and the team that was blue/red
     blue_side_div = soup.find('div', class_='col-12 blue-line-header')
     if not blue_side_div:
@@ -158,7 +208,7 @@ def scrape_teams_side_winner_from_game(html_content: str) -> pd.DataFrame:
     if not red_side_div:
         return pd.DataFrame()
     red_side_team = red_side_div.find('a').text.strip()
-    
+
     blue_side_lost = 'LOSS' in blue_side_div.text
     winner = ""
     loser = ""
@@ -179,6 +229,15 @@ def scrape_teams_side_winner_from_game(html_content: str) -> pd.DataFrame:
     return pd.DataFrame([temp])
 
 def scrape_draft_from_game(html_content: str) -> pd.DataFrame:
+    """
+    Scrapes the draft from a game page.
+
+    Args:
+        html_content (str): The HTML content of the game page.
+
+    Returns:
+        pd.DataFrame: A DataFrame containing the draft.
+    """
     soup = BeautifulSoup(html_content, 'html.parser')
 
     section_divs = soup.find_all("div", class_="col-2")
@@ -202,10 +261,19 @@ def scrape_draft_from_game(html_content: str) -> pd.DataFrame:
     red_bans = bans[len(bans)//2:]
     blue_picks = picks[:len(picks)//2]
     red_picks = picks[len(picks)//2:]
-    
+
     return pd.DataFrame({"blue_bans": blue_bans, "red_bans": red_bans, "blue_picks": blue_picks, "red_picks": red_picks})
 
 def collect_match_patch(html_content: str) -> str:
+    """
+    Scrapes the patch from a match page.
+
+    Args:
+        html_content (str): The HTML content of the match page.
+
+    Returns:
+        str: The patch.
+    """
     soup = BeautifulSoup(html_content, 'html.parser')
     patch_div = soup.find('div', class_='col-3 text-right')
     if patch_div:
@@ -213,6 +281,15 @@ def collect_match_patch(html_content: str) -> str:
     return None
 
 def collect_roster_from_match(html_content: str) -> pd.DataFrame:
+    """
+    Scrapes the roster from a match page.
+
+    Args:
+        html_content (str): The HTML content of the match page.
+
+    Returns:
+        pd.DataFrame: A DataFrame containing the roster.
+    """
     soup = BeautifulSoup(html_content, 'html.parser')
 
     player_links = soup.find_all('a', class_='link-blanc')
@@ -225,6 +302,15 @@ def collect_roster_from_match(html_content: str) -> pd.DataFrame:
         
 
 def scrape_full_tournament(tourney_url_endpoint: str):
+    """
+    Scrapes the full tournament data from a tournament page.
+
+    Args:
+        tourney_url_endpoint (str): The URL endpoint of the tournament.
+
+    Returns:
+        pd.DataFrame: A DataFrame containing the full tournament data.
+    """
     upd_url = GOLGG_BASE_URL + GOLGG_TOURNAMENT_SERIES_ENDPOINT + tourney_url_endpoint
     try:
         res = requests.get(upd_url, headers=HEADERS, timeout=15)
@@ -234,7 +320,7 @@ def scrape_full_tournament(tourney_url_endpoint: str):
         return []
 
     df = pd.DataFrame()
-    
+
     ln = get_all_games_from_tournament(res.text)
     for link in ln:
         try:
@@ -268,19 +354,31 @@ def scrape_full_tournament(tourney_url_endpoint: str):
     return df
 
 def full_season_tourney_list(season: int) -> list[str]:
+    """
+    Scrapes the list of tournaments for a given season.
+
+    Args:
+        season (int): The season.
+
+    Returns:
+        list[str]: A list of tournament names.
+    """
     try:
         res = requests.post(GOLGG_PHP_URL, headers=HEADER_DETAILED, data=GOL_GG_PAYLOAD_GEN(season), timeout=15)
         res.raise_for_status()
     except requests.exceptions.RequestException as e:
         print(f"Error: {e}")
         return []
-    
+
     tourneys = res.json()
 
     tourney_names = [tourney['trname'] for tourney in tourneys]
     return tourney_names
 
 def main():
+    """
+    Main function to run the script.
+    """
 
     # for season in range(10, 12):
     #     for split in [Split.SPRING, Split.SUMMER, Split.WINTER]:
@@ -293,7 +391,7 @@ def main():
     # df = scrape_full_tournament(f"{GOLGG_BASE_URL}{GOLGG_TOURNAMENT_SERIES_ENDPOINT}{tourney}")
     # print(df)
     # df.to_csv(f"drafts_s15Spring.csv", index=False)
-    
+
     # tourney = "First Stand 2025/"
     # try:
     #     res = requests.get(f"{GOLGG_BASE_URL}{GOLGG_TOURNAMENT_SERIES_ENDPOINT}{tourney}", headers=HEADERS)
@@ -301,11 +399,11 @@ def main():
     # except requests.exceptions.RequestException as e:
     #     print(f"Error: {e}")
     #     return
-        
+
     # print(get_all_games_from_tournament(res.text))
 
     # df = scrape_full_tournament("First Stand 2025/")
-    
+
     # df.to_csv(f"drafts_FirstStand2025.csv", index=False)
     # print(df)
 
@@ -320,12 +418,12 @@ def main():
     # for s_num in range(11, 15):
     #     with open (f"tournaments_s{s_num}.txt", "r") as f:ß
     #         tourneys = f.readlines()
-        
+
     #     for tourney in tourneys:
     #         df = scrape_full_tournament(f"{tourney.strip()}/")
     #         df.to_csv(f"drafts_s{s_num}_{tourney.strip()}.csv", index=False)
 
     pass
-    
+
 if __name__ == "__main__":
     main()
