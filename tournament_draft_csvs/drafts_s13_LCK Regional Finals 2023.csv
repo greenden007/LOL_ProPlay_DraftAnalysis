@@ -1,0 +1,67 @@
+blue_bans,red_bans,blue_picks,red_picks,patch,Blue Side Roster,Red Side Roster,blue_side,red_side,winner,loser
+Neeko,Sejuani,Gnar,KSante,13.14,kingen,Canna,,,,
+Tristana,Maokai,Lee Sin,Rell,13.14,Grizzly,Canyon,,,,
+Poppy,Viego,Azir,Xerath,13.14,Zeka,ShowMaker,,,,
+Jax,Nocturne,Xayah,Zeri,13.14,Viper,Deft,,,,
+Lulu,Vi,Alistar,Leona,13.14,Life,Kellin,,,,
+,,,,,,,Hanwha Life eSports,Dplus KIA,blue_side,red_side
+Sejuani,Tristana,KSante,Gnar,13.14,Canna,kingen,,,,
+Maokai,Xayah,Rell,Nocturne,13.14,Canyon,Grizzly,,,,
+Azir,Neeko,Sylas,Akali,13.14,ShowMaker,Zeka,,,,
+Ahri,Jax,Aphelios,Kaisa,13.14,Deft,Viper,,,,
+Yone,LeBlanc,Lulu,Alistar,13.14,Kellin,Life,,,,
+,,,,,,,Dplus KIA,Hanwha Life eSports,blue_side,red_side
+Neeko,Sejuani,Aatrox,Renekton,13.14,kingen,Canna,,,,
+Tristana,Maokai,Nocturne,Poppy,13.14,Grizzly,Canyon,,,,
+Lulu,Xayah,Ahri,Azir,13.14,Zeka,ShowMaker,,,,
+Zeri,Rakan,Kaisa,Nilah,13.14,Viper,Deft,,,,
+Jax,Gnar,Rell,Alistar,13.14,Life,Kellin,,,,
+,,,,,,,Hanwha Life eSports,Dplus KIA,red_side,blue_side
+Neeko,Sejuani,Renekton,KSante,13.14,kingen,Canna,,,,
+Tristana,Maokai,Viego,Rell,13.14,Grizzly,Canyon,,,,
+Poppy,Xayah,Azir,Corki,13.14,Zeka,ShowMaker,,,,
+LeBlanc,Gnar,Kaisa,Aphelios,13.14,Viper,Deft,,,,
+Taliyah,Nocturne,Rakan,Alistar,13.14,Life,Kellin,,,,
+,,,,,,,Hanwha Life eSports,Dplus KIA,red_side,blue_side
+Ahri,Neeko,Renekton,Aatrox,13.14,Canna,Rascal,,,,
+LeBlanc,Tristana,Rell,Maokai,13.14,Canyon,Croco,,,,
+Sejuani,Azir,Sylas,Taliyah,13.14,ShowMaker,FATE,,,,
+Jayce,Jax,Xayah,Zeri,13.14,Deft,Paduck,,,,
+Rumble,Yasuo,Rakan,Alistar,13.14,Kellin,BeryL,,,,
+,,,,,,,Dplus KIA,DRX,blue_side,red_side
+Neeko,Xayah,Malphite,KSante,13.14,Rascal,Canna,,,,
+Tristana,Ahri,Nocturne,Rell,13.14,Croco,Canyon,,,,
+LeBlanc,Vi,Azir,Sylas,13.14,FATE,ShowMaker,,,,
+Taliyah,Poppy,Zeri,Aphelios,13.14,Paduck,Deft,,,,
+Gnar,Sejuani,Leona,Alistar,13.14,BeryL,Kellin,,,,
+,,,,,,,DRX,Dplus KIA,red_side,blue_side
+Alistar,Xayah,KSante,Jax,13.14,Rascal,Canna,,,,
+Neeko,Ahri,Sejuani,Zac,13.14,Croco,Canyon,,,,
+Poppy,Rell,Tristana,Jayce,13.14,FATE,ShowMaker,,,,
+Nocturne,Renekton,Zeri,Kaisa,13.14,Paduck,Deft,,,,
+Vi,Gragas,Maokai,Rakan,13.14,BeryL,Kellin,,,,
+,,,,,,,DRX,Dplus KIA,red_side,blue_side
+Maokai,Alistar,KSante,Gragas,13.14,Kiin,kingen,,,,
+Sejuani,Zeri,Vi,Viego,13.14,Cuzz,Grizzly,,,,
+Xayah,Rell,Azir,Taliyah,13.14,Bdd,Zeka,,,,
+Neeko,Jax,Kaisa,Aphelios,13.14,Aiming,Viper,,,,
+Ahri,KhaZix,Leona,Nautilus,13.14,Lehends,Life,,,,
+,,,,,,,KT Rolster,Hanwha Life eSports,blue_side,red_side
+Alistar,Maokai,KSante,Malphite,13.14,kingen,Kiin,,,,
+Xayah,Sejuani,Vi,Poppy,13.14,Grizzly,Cuzz,,,,
+Viego,Neeko,Ahri,Azir,13.14,Zeka,Bdd,,,,
+Rell,Leona,Zeri,Kaisa,13.14,Viper,Aiming,,,,
+Jax,Rakan,Blitzcrank,Nautilus,13.14,Life,Lehends,,,,
+,,,,,,,Hanwha Life eSports,KT Rolster,red_side,blue_side
+Alistar,Maokai,Gnar,KSante,13.14,kingen,Kiin,,,,
+Kaisa,Sejuani,Nocturne,Rell,13.14,Grizzly,Cuzz,,,,
+Xayah,Zeri,Azir,Tristana,13.14,Zeka,Bdd,,,,
+Varus,Jax,Aphelios,Nilah,13.14,Viper,Aiming,,,,
+Malphite,Rakan,Braum,Nautilus,13.14,Life,Lehends,,,,
+,,,,,,,Hanwha Life eSports,KT Rolster,blue_side,red_side
+Maokai,Alistar,Aatrox,Rumble,13.14,Kiin,kingen,,,,
+Sejuani,Zeri,Poppy,Rell,13.14,Cuzz,Grizzly,,,,
+Xayah,Kaisa,Azir,Yone,13.14,Bdd,Zeka,,,,
+Aphelios,Jax,Ezreal,Varus,13.14,Aiming,Viper,,,,
+Gnar,Renekton,Leona,Nautilus,13.14,Lehends,Life,,,,
+,,,,,,,KT Rolster,Hanwha Life eSports,blue_side,red_side

@@ -1,0 +1,73 @@
+blue_bans,red_bans,blue_picks,red_picks,patch,Blue Side Roster,Red Side Roster,blue_side,red_side,winner,loser
+Renekton,Ryze,Kennen,Gnar,11.16,Canna,Morgan,,,,
+Camille,Jayce,Lee Sin,Xin Zhao,11.16,Oner,Willer,,,,
+LeBlanc,Viego,Kassadin,Azir,11.16,Faker,Chovy,,,,
+Leona,Kalista,Aphelios,Varus,11.16,Gumayusi,Deft,,,,
+Braum,Ashe,Thresh,Karma,11.16,Keria,Vsta,,,,
+,,,,,,,T1,Hanwha Life eSports,blue_side,red_side
+LeBlanc,Ryze,Kennen,Gnar,11.16,Canna,Morgan,,,,
+Camille,Jayce,Xin Zhao,Viego,11.16,Oner,Willer,,,,
+Renekton,Lee Sin,Azir,Orianna,11.16,Faker,Chovy,,,,
+Varus,Kalista,Jinx,Aphelios,11.16,Gumayusi,Deft,,,,
+Leona,Ashe,Braum,Zilean,11.16,Keria,Vsta,,,,
+,,,,,,,T1,Hanwha Life eSports,blue_side,red_side
+Renekton,Ryze,Kennen,Irelia,11.16,Canna,Morgan,,,,
+Camille,Jayce,Xin Zhao,Viego,11.16,Oner,Willer,,,,
+LeBlanc,Lee Sin,Azir,Sylas,11.16,Faker,Chovy,,,,
+Ashe,Braum,Ezreal,Aphelios,11.16,Gumayusi,Deft,,,,
+Thresh,Varus,Leona,Rakan,11.16,Keria,Vsta,,,,
+,,,,,,,T1,Hanwha Life eSports,red_side,blue_side
+Camille,Ryze,Kennen,Irelia,11.16,Canna,Morgan,,,,
+LeBlanc,Jayce,Xin Zhao,Viego,11.16,Oner,Willer,,,,
+Sylas,Lee Sin,Azir,Orianna,11.16,Faker,Chovy,,,,
+Ashe,Kalista,Ezreal,Varus,11.16,Gumayusi,Deft,,,,
+Aphelios,Braum,Leona,Rakan,11.16,Keria,Vsta,,,,
+,,,,,,,T1,Hanwha Life eSports,red_side,blue_side
+Ryze,Lee Sin,Renekton,Kennen,11.16,Morgan,Canna,,,,
+Jayce,Camille,Viego,Xin Zhao,11.16,Willer,Oner,,,,
+Irelia,LeBlanc,Orianna,Azir,11.16,Chovy,Faker,,,,
+Kalista,Sylas,Varus,Aphelios,11.16,Deft,Gumayusi,,,,
+Ashe,Rakan,Alistar,Leona,11.16,Vsta,Keria,,,,
+,,,,,,,Hanwha Life eSports,T1,red_side,blue_side
+LeBlanc,Ryze,Kennen,Camille,11.16,Rich,Morgan,,,,
+Twisted Fate,Jayce,Trundle,Viego,11.16,Peanut,Willer,,,,
+Lee Sin,Irelia,Syndra,Azir,11.16,Gori,Chovy,,,,
+Braum,Diana,Aphelios,Varus,11.16,deokdam,Deft,,,,
+Alistar,Sylas,Thresh,Leona,11.16,Kellin,Vsta,,,,
+,,,,,,,Nongshim RedForce,Hanwha Life eSports,red_side,blue_side
+LeBlanc,Ryze,Kennen,Renekton,11.16,Rich,Morgan,,,,
+Camille,Jayce,Xin Zhao,Viego,11.16,Peanut,Willer,,,,
+Twisted Fate,Lee Sin,Irelia,Azir,11.16,Gori,Chovy,,,,
+Nidalee,Aphelios,Ziggs,Varus,11.16,deokdam,Deft,,,,
+Trundle,Ezreal,Leona,Rakan,11.16,Kellin,Vsta,,,,
+,,,,,,,Nongshim RedForce,Hanwha Life eSports,red_side,blue_side
+LeBlanc,Ryze,Jax,Camille,11.16,Rich,Morgan,,,,
+Twisted Fate,Jayce,Nidalee,Lee Sin,11.16,Peanut,Willer,,,,
+Varus,Aphelios,Azir,Galio,11.16,Gori,Chovy,,,,
+Braum,Renekton,Ezreal,Ashe,11.16,deokdam,Deft,,,,
+Zoe,Gnar,Leona,Lulu,11.16,Kellin,Vsta,,,,
+,,,,,,,Nongshim RedForce,Hanwha Life eSports,red_side,blue_side
+Gnar,Irelia,Camille,Kennen,11.16,Morgan,Summit,,,,
+Ryze,Renekton,Xin Zhao,Viego,11.16,Willer,Croco,,,,
+Jayce,Lee Sin,LeBlanc,Azir,11.16,Chovy,FATE,,,,
+Kalista,Ziggs,Varus,Ezreal,11.16,Deft,Prince,,,,
+No ban,Ashe,Braum,Leona,11.16,Vsta,Effort,,,,
+,,,,,,,Hanwha Life eSports,Liiv SANDBOX,red_side,blue_side
+Gnar,Irelia,Camille,Kennen,11.16,Morgan,Summit,,,,
+Ryze,Renekton,Olaf,Viego,11.16,Willer,Croco,,,,
+Jayce,Lee Sin,LeBlanc,Azir,11.16,Chovy,FATE,,,,
+Kalista,Ziggs,Varus,Aphelios,11.16,Deft,Prince,,,,
+Leona,Ashe,Braum,Thresh,11.16,Vsta,Effort,,,,
+,,,,,,,Hanwha Life eSports,Liiv SANDBOX,blue_side,red_side
+Irelia,Ryze,Jayce,Camille,11.16,Summit,Morgan,,,,
+LeBlanc,Gnar,Nidalee,Viego,11.16,Croco,Willer,,,,
+Renekton,Lee Sin,Azir,Twisted Fate,11.16,FATE,Chovy,,,,
+Ziggs,Kalista,Ezreal,Aphelios,11.16,Prince,Deft,,,,
+Ashe,Varus,Leona,Braum,11.16,Effort,Vsta,,,,
+,,,,,,,Liiv SANDBOX,Hanwha Life eSports,red_side,blue_side
+Irelia,Ryze,Kennen,Camille,11.16,Summit,Morgan,,,,
+LeBlanc,Gnar,Lee Sin,Viego,11.16,Croco,Willer,,,,
+Renekton,Rammus,Azir,Twisted Fate,11.16,FATE,Chovy,,,,
+Ziggs,Kalista,Samira,Ezreal,11.16,Prince,Deft,,,,
+Aphelios,Varus,Alistar,Rakan,11.16,Effort,Vsta,,,,
+,,,,,,,Liiv SANDBOX,Hanwha Life eSports,red_side,blue_side
